@@ -189,11 +189,23 @@ def editor_view(request):
             user=request.user
         ).first()
 
+    # coleta debug de URL inicial e backend de storage
+    initial_image_url = None
+    if last_image:
+        try:
+            field = last_image.result_image if last_image.result_image else last_image.original_image
+            initial_image_url = field.url
+        except Exception:
+            initial_image_url = None
+
     context = {
         'presets': presets,
         'upload_form': upload_form,
         'preset_form': preset_form,
         'last_image': last_image,
+        'initial_image_url': initial_image_url,
+        'storage_backend': getattr(settings, 'DEFAULT_FILE_STORAGE', ''),
+        'media_url': getattr(settings, 'MEDIA_URL', ''),
     }
     return render(request, 'editor/editor.html', context)
 
