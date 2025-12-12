@@ -12,7 +12,7 @@ from django.core.files.base import ContentFile
 import json
 import requests
 import time
-import tensorflow as tf
+
 from .segmentation import run_deeplab_mask, apply_gray_inside_mask
 from .models import ProcessedImage, IALog
 import replicate
@@ -207,24 +207,27 @@ def inpainting(image_obj: ProcessedImage, prompt: str | None = None) -> None:
         _log(image_obj, 'inpainting_stub', elapsed, 'error', str(exc))
         raise
 
-# carregando modelo DeepLab 
-
-MODEL_PATH = os.path.join(
-    settings.BASE_DIR,
-    "editor",
-    "ai_models",
-    "deeplab_v3_257_mv_gpu.tflite"
-)
-
-DEEP_LAB = tf.lite.Interpreter(model_path=MODEL_PATH)
-
-DEEP_LAB.allocate_tensors()
-
-input_details = DEEP_LAB.get_input_details()
-output_details = DEEP_LAB.get_output_details()
 
 
 def apply_deeplab(processed_image: "ProcessedImage"):
+    import tensorflow as tf
+    import os
+    from django.conf import settings
+    import numpy as np
+    from PIL import Image, ImageChops, ImageDraw
+
+    model_path = os.path.join(
+        settings.BASE_DIR,
+        "editor",
+        "ai_models",
+        "deeplab_v3_257_mv_gpu.tflite"
+    )
+
+    interpreter = tf.lite.Interpreter(model_path=model_path)
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+
     """
     Usa o DeepLab apenas para melhorar o contorno da seleção.
     NÃO aplica preto e branco, NÃO altera a imagem original.
