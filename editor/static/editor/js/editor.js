@@ -107,6 +107,12 @@ function loadInitialImage() {
       }, delay);
     } else {
       console.error("Não foi possível carregar a imagem inicial após múltiplas tentativas.");
+      // Fallback: tenta gerar um preview via AJAX (usa sliders atuais)
+      try {
+        aplicarAJAX();
+      } catch (e) {
+        console.error("Falha ao acionar fallback de preview via AJAX:", e);
+      }
     }
   };
 
