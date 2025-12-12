@@ -5,6 +5,8 @@ python-dotenv
 Pillow
 requests
 whitenoise
+cloudinary
+django-cloudinary-storage
 
 # IA
 tensorflow==2.20.0

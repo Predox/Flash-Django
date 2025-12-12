@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import cloudinary
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,8 +13,8 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
 
 ALLOWED_HOSTS = [
-    "flash-django-production.up.railway.app",
     ".up.railway.app",
+    "flash-django-production.up.railway.app",
     "localhost",
     "127.0.0.1",
 ]
@@ -26,6 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'editor',
+    'cloudinary',
+    'cloudinary_storage'
 ]
 
 MIDDLEWARE = [
@@ -82,8 +85,8 @@ STATICFILES_DIRS = [
 ]
 
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -97,3 +100,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://flash-django-production.up.railway.app",
     "https://*.up.railway.app",
 ]
+
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)
