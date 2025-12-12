@@ -1,0 +1,126 @@
+{% extends "editor/base.html" %}
+{% load static %}
+{% block body %}
+<head>
+  <link rel="stylesheet" href="/static/editor/css/styleProfile.css">
+</head>
+<div class="profile-layout">
+
+  <!-- HEADER ------------------------------------------------>
+  <header class="profile-header">
+      <a href="{% url 'editor:editor' %}" class="icon-back">←</a>
+      <h1 class="logo">FLASH</h1>
+      <a href="#" class="icon-settings" id="open-profile-modal">⚙</a>
+  </header>
+
+  <!-- ÁREA CENTRAL DO PERFIL -------------------------------->
+  <section class="profile-info">
+
+    <div class="profile-photo">
+      {% if user.profile.profile_photo %}
+          <img src="{{ user.profile.profile_photo.url }}" alt="">
+      {% else %}
+          <span>{{ user.username|first|upper }}</span>
+      {% endif %}
+  </div>
+
+      <h2 class="profile-name">{{ user.get_full_name|default:user.username }}</h2>
+      <p class="profile-email">{{ user.email }}</p>
+
+      <p class="profile-count">
+          {{ total_images }} fotos editadas
+      </p>
+
+  </section>
+
+  <!-- GALERIA -------------------------------------------------->
+  <section class="profile-gallery">
+      <h3 class="gallery-title">Imagens Editadas</h3>
+
+      <div class="gallery-grid">
+          {% for img in images %}
+          <article class="gallery-item">
+
+            <div class="gallery-thumb">
+                {% if img.result_image %}
+                    <img src="{{ img.result_image.url }}" alt="">
+                {% else %}
+                    <img src="{{ img.original_image.url }}" alt="">
+                {% endif %}
+        
+                <!-- ÍCONE DE EDITAR NO HOVER -->
+                <a href="{% url 'editor:editor_with_image' img.id %}" class="hover-edit">
+                  ✎
+              </a>
+              
+            </div>
+        
+            <footer class="gallery-footer">
+                <span class="file-name">{{ img.original_image.name|slice:'-20:' }}</span>
+            </footer>
+        
+        </article>
+        
+          {% empty %}
+              <p class="empty-msg">Você ainda não editou nenhuma imagem.</p>
+          {% endfor %}
+      </div>
+
+  </section>
+
+</div>
+
+<!-- MODAL =========================================== -->
+<div id="profile-modal" class="modal-overlay hidden">
+
+  <div class="modal-box">
+
+      <header class="modal-header">
+          <h2>Editar Perfil</h2>
+          <button id="close-profile-modal" class="close-btn">&times;</button>
+      </header>
+
+      <hr>
+      <form method="POST" enctype="multipart/form-data" action="{% url 'editor:update_profile' %}">
+          {% csrf_token %}
+
+          <!-- FOTO -->
+          <div class="modal-photo-area">
+              <label for="photo-input" class="photo-wrapper">
+                <img id="photo-preview"
+                src="{% if user.profile.profile_photo %}{{ user.profile.profile_photo.url }}{% else %}/static/editor/img/user-default.png{% endif %}">
+           
+                  <span class="upload-icon">⤒</span>
+              </label>
+              <input type="file" id="photo-input" name="photo" accept="image/*" hidden>
+              <p class="photo-hint">Clique no ícone para alterar a foto</p>
+          </div>
+
+          <!-- CAMPOS -->
+          <div class="modal-fields">
+              <label>Nome</label>
+              <input type="text" name="name" value="{{ user.first_name }}">
+
+              <label>E-mail</label>
+              <input type="email" value="{{ user.email }}" disabled>
+              <small>O e-mail não pode ser alterado</small>
+          </div>
+
+          <!-- BOTÕES -->
+          <footer class="modal-footer">
+            <button type="button" class="btn-cancel" id="cancel-profile-edit">Cancelar</button>
+            <button type="submit" class="btn-save">Salvar</button>
+        </footer>
+        
+        <!-- Botão SAIR -->
+        <div class="logout-area">
+            <a href="{% url 'auth:logout' %}" class="logout-btn">Sair</a>
+        </div>
+
+      </form>
+  </div>
+
+</div>
+
+<script src="{% static 'editor/js/profile.js' %}"></script>
+{% endblock %}

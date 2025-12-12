@@ -1,0 +1,10 @@
+# Core
+Django>=5.2,<6.0
+gunicorn
+python-dotenv
+requests
+Pillow
+
+# IA / Imagem
+rembg==2.0.56
+replicate

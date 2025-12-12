@@ -1,0 +1,368 @@
+/* LAYOUT GERAL */
+.profile-layout {
+    background: #111;
+    color: #ddd;
+    min-height: 100vh;
+    padding: 0 40px;
+}
+
+/* HEADER -----------------------------------------------------*/
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    color: #fff;
+}
+
+.profile-header .logo {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.icon-back,
+.icon-settings {
+    font-size: 20px;
+    text-decoration: none;
+    color: #ccc;
+}
+
+/* PERFIL ------------------------------------------------------*/
+.profile-info {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.profile-photo {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto;
+    border-radius: 100%;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 45px;
+    color: #777;
+    background: #1a1a1a;
+    object-fit: fill;
+}
+
+.profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 100%;
+}
+
+.profile-name {
+    margin-top: 15px;
+    font-size: 22px;
+    color: #f5f5f5;
+    font-weight: 500;
+}
+
+.profile-email {
+    font-size: 15px;
+    color: #999;
+}
+
+.profile-count {
+    margin-top: 8px;
+    font-size: 15px;
+    color: #bbb;
+}
+
+/* GALERIA -----------------------------------------------------*/
+.gallery-title {
+    margin-top: 45px;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.profile-gallery{
+    
+    margin: 0 200px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.gallery-item {
+    background: #0c0c0c;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.gallery-thumb img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: #000;
+}
+
+.gallery-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 12px;
+    align-items: center;
+    background: #111;
+}
+
+.file-name {
+    color: #ccc;
+    font-size: 14px;
+}
+
+.edit-icon {
+    color: #888;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+/* GRID GERAL */
+.gallery-grid {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+}
+
+/* CARD */
+.gallery-item {
+    background: #141414;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #1f1f1f;
+    transition: transform .15s ease;
+}
+
+.gallery-item:hover {
+    transform: scale(1.01);
+}
+
+/* MINIATURA */
+.gallery-thumb {
+    position: relative;
+    width: 100%;
+    height: 210px; 
+    background: #000;
+}
+
+.gallery-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid #1f1f1f;
+}
+
+/* ÍCONE DE EDITAR NO HOVER */
+.hover-edit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.55);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    text-decoration: none;
+    color: #ccc;
+    font-size: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+
+.gallery-thumb:hover .hover-edit {
+    opacity: 1;
+}
+
+/* FOOTER DO CARD */
+.gallery-footer {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    background: #111;
+}
+
+.file-name {
+    color: #d0d0d0;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Caixa */
+.modal-box {
+    width: 480px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 25px;
+    color: #fff;
+}
+
+/* Header */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #aaa;
+    cursor: pointer;
+}
+
+/* FOTO */
+.modal-photo-area {
+    text-align: center;
+}
+
+.photo-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #333;
+    margin: 30px 0;
+}
+
+.photo-hint{
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.45);
+}
+
+.modal-photo-area img {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #333;
+}
+
+.upload-icon {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 0;
+    right: 0;
+    background: #444;
+    padding: 8px;
+    border-radius: 50%;
+    font-size: 14px;
+}
+
+.modal-fields {
+    margin-top: 20px;
+}
+
+.modal-fields label{
+    font-size: 0.8em;
+    margin-bottom: 50px !important;
+    color: rgba(255,255,255,0.65);
+
+}
+.modal-fields small{
+    margin-bottom: 50px !important;
+    color: rgba(255,255,255,0.45);
+
+}
+
+.modal-fields input {
+    width: 100%;
+    padding: 10px;
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 5px;
+    color: #fff;
+    margin-bottom: 15px;
+    margin-top: 10px;
+}
+
+.modal-fields input[type="email"] {
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 0;
+}
+
+/* FOOTER */
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+
+.btn-cancel, .btn-save {
+    width: 48%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: #333;
+    color: #fff;
+}
+
+.btn-save {
+    background: #fff;
+    color: #000;
+    font-weight: bold;
+}
+
+.logout-area {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.logout-btn {
+    display: inline-block;
+    color: #ff4444;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+.logout-btn:hover {
+    color: #cc0000;
+    text-decoration: underline;
+}

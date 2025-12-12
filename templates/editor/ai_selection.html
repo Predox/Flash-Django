@@ -1,0 +1,91 @@
+{% extends "editor/base.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'editor/css/styleSelection.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<main class="ai-selection-main">
+
+  <!-- HEADER -->
+  <header class="header">
+
+    <!-- MENU HAMBÚRGUER -->
+    <a href="{% url 'editor:editor' %}" class="close-btn">
+      <i class="bi bi-x"></i>
+    </a>
+
+    <h1 class="header-logo">FLASH</h1>
+
+    <!-- PERFIL -->
+    <a href="{% url 'editor:profile' %}" class="header-avatar">
+      {% if user.profile.profile_photo %}
+      <img class="avatar-mini" src="{{ user.profile.profile_photo.url }}">
+      {% else %}
+      <i class="bi bi-person-circle"></i>
+      {% endif %}
+    </a>
+
+  </header>
+
+  <div id="selectionPopup" class="selection-popup hidden">
+    <button id="popupClose" class="popup-btn">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <button id="popupDelete" class="popup-btn delete">
+      <i class="bi bi-trash"></i>
+    </button>
+  </div>
+  <div id="aiLoadingOverlay" class="ai-loading hidden">
+    <div class="ai-spinner"></div>
+    <p>Gerando imagem, aguarde...</p>
+  </div>
+
+  <section class="ai-preview" id="ai-preview">
+    <canvas id="selectionCanvas" class="ai-preview-canvas"></canvas>
+    <img id="selection-hidden-img"
+      src="{% if image.result_image %}{{ image.result_image.url }}{% else %}{{ image.original_image.url }}{% endif %}"
+      style="display:none;">
+  </section>
+
+
+  <div id="selectionTooltip" class="ai-tooltip hidden">
+    <button id="btnRemoveLast" class="ai-btn-round">✕</button>
+    <button id="btnClearSelections" class="ai-btn-round ai-btn-delete">🗑</button>
+  </div>
+
+  <div class="edit-mode-box">
+    <label class="mode-label">Modo de edição:</label>
+
+    <label class="mode-option">
+      <input type="radio" name="edit_mode" value="local" checked>
+      Ajuste apenas a área selecionada
+    </label>
+
+    <label class="mode-option">
+      <input type="radio" name="edit_mode" value="full">
+      Transformar imagem inteira (Pix2Pix)
+    </label>
+  </div>
+  <form method="POST" class="ai-prompt-form" id="aiSelectionForm" onsubmit="event.preventDefault();">
+    {% csrf_token %}
+    <input type="hidden" id="selectionsInput" name="selections_json">
+    <label for="prompt">Inserir prompt</label>
+    <input type="text" id="prompt-input" name="prompt" placeholder="Descreva...">
+    <button type="button" class="btn btn-primary" onclick="sendPromptToAI()">Salvar</button>
+  </form>
+
+
+
+</main>
+
+<script>
+  window.IMAGE_ID = "{{ image.id }}";
+  window.CSRF_TOKEN = "{{ csrf_token }}";
+</script>
+<script src="{% static 'editor/js/aiprompt.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/polygon-clipping@0.15.3/dist/polygon-clipping.min.js"></script>
+<script src="{% static 'editor/js/selection.js' %}"></script>
+{% endblock %}

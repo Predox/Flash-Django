@@ -1,0 +1,214 @@
+{% extends "editor/base.html" %}
+{% load static %}
+{% block body %}
+<div class="layout">
+
+  <!-- HEADER -->
+  <header class="header">
+
+    <!-- MENU HAMBÚRGUER -->
+    <button id="sidebar-toggle" class="hamburger-btn">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <h1 class="header-logo">FLASH</h1>
+
+    <a href="{% url 'editor:profile' %}" class="header-avatar">
+      {% if user.profile.profile_photo %}
+      <img class="avatar-mini" src="{{ user.profile.profile_photo.url }}">
+      {% else %}
+      <i class="bi bi-person-circle"></i>
+      {% endif %}
+    </a>
+
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main">
+
+    <!-- SIDEBAR (COLAPSÁVEL) -->
+    <aside id="sidebar" class="sidebar collapsible">
+
+      <div class="sidebar-block">
+        <span class="sidebar-title">Presets</span>
+
+        <div class="preset-dropdown" id="presetDropdown">
+          <button type="button" class="preset-trigger" id="presetTrigger">
+            <span id="presetTriggerText">Selecione um preset</span>
+            <i class="bi bi-chevron-down"></i>
+          </button>
+
+          <div class="preset-menu hidden" id="presetMenu">
+            {% if presets %}
+            {% for preset in presets %}
+            <div class="preset-item" data-preset-id="{{ preset.id }}">
+              <button type="button" class="preset-pick">
+                {{ preset.name }}
+              </button>
+
+              <button type="button" class="preset-delete" title="Apagar preset" data-delete-id="{{ preset.id }}">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="preset-empty">Nenhum preset salvo ainda.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- SLIDERS -->
+      <form method="post" class="sidebar-block sliders-form">
+        {% csrf_token %}
+        {% if last_image %}
+        <input type="hidden" name="image_id" value="{{ last_image.id }}">
+        {% endif %}
+        <span class="sidebar-title">Ajustes</span>
+
+        <label class="slider-label">Exposição
+          <input type="range" name="exposure" min="-100" max="100"
+            value="{% if last_image %}{{ last_image.params.exposure|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+        <label class="slider-label">Contraste
+          <input type="range" name="contrast" min="-100" max="100"
+            value="{% if last_image %}{{ last_image.params.contrast|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+        <label class="slider-label">Realce
+          <input type="range" name="highlights" min="-100" max="100"
+            value="{% if last_image %}{{ last_image.params.highlights|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+        <label class="slider-label">Sombras
+          <input type="range" name="shadows" min="-100" max="100"
+            value="{% if last_image %}{{ last_image.params.shadows|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+        <label class="slider-label">Brancos
+          <input type="range" name="whites" min="-100" max="100"
+            value="{% if last_image %}{{ last_image.params.whites|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+        <label class="slider-label">Pretos
+          <input type="range" name="blacks" min="-100" max="100"
+            value="{% if last_image %}{{ last_image.params.blacks|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+        <label class="slider-label">Saturação
+          <input type="range" name="saturation" min="-100" max="100"
+            value="{% if last_image %}{{ last_image.params.saturation|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+        <label class="slider-label">Textura
+          <input type="range" name="texture" min="-100" max="100"
+            value="{% if last_image %}{{ last_image.params.texture|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+        <label class="slider-label">Desfoque do Fundo
+          <input type="range" name="background_blur" min="0" max="100"
+            value="{% if last_image %}{{ last_image.params.background_blur|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+        <label class="slider-label">Nitidez
+          <input type="range" name="sharpness" min="0" max="100"
+            value="{% if last_image %}{{ last_image.params.sharpness|default:0 }}{% else %}0{% endif %}">
+        </label>
+
+
+
+
+      </form>
+
+      <!-- SALVAR PRESET -->
+      <div class="sidebar-block">
+        <span class="sidebar-title">Salvar Presets</span>
+        <form method="post">
+          {% csrf_token %}
+          <input type="text" name="name" class="sidebar-input" placeholder="Nome do preset">
+          <button type="submit" name="save_preset" class="btn-primary btn-full"><i
+              class="bi bi-floppy-fill"></i></button>
+        </form>
+      </div>
+
+    </aside>
+
+    <!-- ÁREA DO EDITOR -->
+    <main class="editor-area">
+
+      <div class="editor-top-bar"></div>
+
+      <!-- BOTÃO REMOVER FUNDO -->
+      {% if last_image %}
+      <button type="button" class="remove-bg-btn" id="btn-remove-bg">
+        <i class="bi bi-scissors"></i> Remover fundo
+      </button>
+
+        {% if last_image.result_image %}
+        <a href="{% url 'editor:undo_remove_bg' last_image.id %}" class="undo-bg-btn" id="btn-undo-bg">
+          <i class="bi bi-arrow-counterclockwise"></i> Desfazer
+        </a>
+        {% endif %}
+      {% endif %}
+
+
+      <section class="canvas canvas-centered" id="canvas">
+
+        {% if last_image %}
+        <canvas id="editor-canvas" class="canvas-image"></canvas>
+
+        <img id="original-image" style="display:none;"
+          src="{% if last_image.result_image %}{{ last_image.result_image.url }}{% else %}{{ last_image.original_image.url }}{% endif %}">
+
+        {% else %}
+        <div class="canvas-empty">
+          <div class="canvas-empty-icon"><i class="bi bi-upload"></i></div>
+          <p>Clique em importar ou arraste a imagem até aqui</p>
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" id="drop-form" class="drop-form">
+          {% csrf_token %}
+          <input type="file" id="file-input" name="original_image" class="hidden-file">
+        </form>
+
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="editor-footer">
+        <button type="button" id="btn-importar" class="btn-secondary">
+          <i class="bi bi-upload"></i> Importar
+        </button>
+
+        {% if last_image %}
+
+        {% if last_image.result_image %}
+        <button type="button" id="btn-exportar" class="btn-secondary">
+          <i class="bi bi-download"></i> Exportar
+        </button>
+
+        {% else %}
+        <a href="{{ last_image.original_image.url }}" download class="btn-secondary"><i class="bi bi-download"></i>
+          Exportar</a>
+        {% endif %}
+
+        <a href="{% url 'editor:ai_selection' last_image.id %}" class="btn-primary">
+          <i class="bi bi-stars"></i> Ajustar com IA
+        </a>
+
+        {% endif %}
+      </footer>
+
+      <script>
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+      </script>
+      <script src="{% static 'editor/js/presets.js' %}"></script>
+    </main>
+
+  </div>
+</div>
+
+{% endblock %}
