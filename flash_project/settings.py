@@ -89,7 +89,18 @@ STATICFILES_DIRS = [
 ]
 
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
+MEDIA_ROOT = BASE_DIR / os.getenv("MEDIA_ROOT", "media")
+
+# Condicional: usa Cloudinary se credenciais existirem; caso contrário, FileSystemStorage (disco)
+CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
+CLOUD_KEY = os.getenv("CLOUDINARY_API_KEY")
+CLOUD_SECRET = os.getenv("CLOUDINARY_API_SECRET")
+
+if CLOUD_NAME and CLOUD_KEY and CLOUD_SECRET:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -105,8 +116,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.up.railway.app",
 ]
 
-cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
-)
+if CLOUD_NAME and CLOUD_KEY and CLOUD_SECRET:
+    cloudinary.config(
+        cloud_name=CLOUD_NAME,
+        api_key=CLOUD_KEY,
+        api_secret=CLOUD_SECRET,
+    )
