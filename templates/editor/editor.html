@@ -204,6 +204,15 @@
 
       <script>
         window.CSRF_TOKEN = "{{ csrf_token }}";
+        // Debug helpers: ver URL inicial e backend de storage usados no preview
+        window.FLASH_DEBUG = {
+          initialImageUrl: "{{ initial_image_url|default:'' }}",
+          storageBackend: "{{ storage_backend|default:'' }}",
+          mediaUrl: "{{ media_url|default:'' }}"
+        };
+        console.log("[FLASH] storageBackend=", window.FLASH_DEBUG.storageBackend);
+        console.log("[FLASH] mediaUrl=", window.FLASH_DEBUG.mediaUrl);
+        console.log("[FLASH] initialImageUrl=", window.FLASH_DEBUG.initialImageUrl);
       </script>
       <script src="{% static 'editor/js/editor.js' %}"></script>
       <script src="{% static 'editor/js/presets.js' %}"></script>
