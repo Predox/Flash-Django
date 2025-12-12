@@ -277,7 +277,37 @@ function setupImport() {
 
   if (importBtn && fileInput && dropForm) {
     importBtn.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", () => dropForm.submit());
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result;
+
+          const previewImg = new Image();
+          previewImg.onload = () => {
+            img = previewImg;
+            if (hiddenImg) hiddenImg.src = dataUrl;
+            // Atualiza base64 atual para AJAX de sliders
+            try {
+              const base64 = (dataUrl || "").toString().split(",")[1] || "";
+              window.currentImageBase64 = base64;
+            } catch (e) {
+              window.currentImageBase64 = undefined;
+            }
+            fitImageToCanvas();
+          };
+          previewImg.src = dataUrl;
+
+          // Prossegue com upload para persistência no servidor
+          setTimeout(() => dropForm.submit(), 50);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // Sem arquivo? Apenas submete como antes
+        dropForm.submit();
+      }
+    });
   }
 
   if (canvasContainer && dropForm && fileInput) {
