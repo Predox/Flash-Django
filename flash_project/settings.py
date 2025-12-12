@@ -99,6 +99,13 @@ CLOUD_SECRET = os.getenv("CLOUDINARY_API_SECRET")
 
 if CLOUD_NAME and CLOUD_KEY and CLOUD_SECRET:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    # Garante URLs HTTPS da Cloudinary em produção
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUD_NAME,
+        'API_KEY': CLOUD_KEY,
+        'API_SECRET': CLOUD_SECRET,
+        'SECURE': True,
+    }
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
@@ -121,4 +128,5 @@ if CLOUD_NAME and CLOUD_KEY and CLOUD_SECRET:
         cloud_name=CLOUD_NAME,
         api_key=CLOUD_KEY,
         api_secret=CLOUD_SECRET,
+        secure=True,
     )
