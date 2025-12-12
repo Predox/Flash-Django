@@ -82,6 +82,8 @@ function loadInitialImage() {
   if (!hiddenImg || !hiddenImg.src) return;
 
   img = new Image();
+  // evita taint do canvas ao carregar imagens de CDN
+  img.crossOrigin = "anonymous";
   img.onload = () => {
     fitImageToCanvas();
   };
@@ -350,6 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hiddenImg.src = data.image_url;
 
         img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = fitImageToCanvas;
         img.src = data.image_url;
       }
