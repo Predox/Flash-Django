@@ -11,7 +11,12 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 
 REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "flash-django-production.up.railway.app",
+    ".up.railway.app",
+    "localhost",
+    "127.0.0.1",
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
