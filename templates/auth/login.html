@@ -16,7 +16,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             padding: 20px;
         }
 
@@ -54,6 +54,12 @@
         }
 
         /* ---------- FORM ---------- */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
         .auth-form label {
             display: block;
             margin: 15px 0 5px;
@@ -62,7 +68,6 @@
         }
 
         .auth-form input {
-            width: 100%;
             padding: 12px 14px;
             background: #1a1d24;
             border: 1px solid #2c2f36;
@@ -115,6 +120,7 @@
             border-radius: 10px;
             margin-bottom: 15px;
             font-size: 14px;
+            align-self: center;
         }
 
         .auth-messages li {
@@ -130,6 +136,7 @@
             border-radius: 10px;
             margin-bottom: 15px;
             font-size: 14px;
+            align-self: center;
         }
 
         /* ---------- FOOTER ---------- */
