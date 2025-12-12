@@ -24,12 +24,10 @@
     formData.append("prompt", prompt);
     formData.append("selection", JSON.stringify(window.currentSelection));
 
-    const csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
-
     console.log("📡 Enviando requisição para IA…");
     const resp = await fetch(`/apply_custom_edit/${IMAGE_ID}/`, {
         method: "POST",
-        headers: { "X-CSRFToken": csrf },
+        headers: { "X-CSRFToken": getCSRFToken() },
         body: formData
     });
     const data = await resp.json();
@@ -75,7 +73,7 @@ async function sendPromptToAI() {
 
         const res = await fetch(`/apply_custom_edit/${imageId}/`, {
             method: "POST",
-            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            headers: { "X-CSRFToken": getCSRFToken() },
             body: formData
         });
 

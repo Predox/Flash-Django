@@ -462,12 +462,6 @@ drawImage();
     // ENVIAR SELEÇÃO AO BACKEND AUTOMATICAMENTE
     // ------------------------------------------------------------
 
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-    }
-
     function convertSelectionToImageSpace(selection) {
         if (!img.drawPos) return selection;
 
@@ -494,7 +488,7 @@ drawImage();
             const res = await fetch(`/apply_deeplab_ajax/${imageId}/`, {
                 method: "POST",
                 headers: {
-                    "X-CSRFToken": getCookie("csrftoken")
+                    "X-CSRFToken": getCSRFToken()
                 },
                 body: formData
             });

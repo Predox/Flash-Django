@@ -17,6 +17,12 @@
 
 <body class="app-body">
   {% block body %}{% endblock %}
+  <script>
+    function getCSRFToken() {
+      const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+      return tokenInput ? tokenInput.value : '';
+    }
+  </script>
   <script src="{% static 'editor/js/editor.js' %}"></script>
 </body>
 

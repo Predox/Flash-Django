@@ -17,26 +17,6 @@ let lastX = 0;
 let lastY = 0;
 
 
-
-
-// ----------------------------------------------------------
-// FUNÇÃO PARA PEGAR CSRF DO COOKIE (padrão Django)
-// ----------------------------------------------------------
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === (name + "=")) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-
 // ----------------------------------------------------------
 // FUNÇÃO GLOBAL PARA ATUALIZAR PREVIEW (USADA PELOS PRESETS)
 // ----------------------------------------------------------
@@ -345,7 +325,7 @@ document.getElementById("btn-remove-bg").addEventListener("click", (e) => {
     const response = await fetch("/remove-bg-live/", {
       method: "POST",
       body: formData,
-      headers: { "X-CSRFToken": getCookie("csrftoken") }
+      headers: { "X-CSRFToken": getCSRFToken() }
     });
 
     const data = await response.json();

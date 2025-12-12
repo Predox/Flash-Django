@@ -7,13 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const slidersForm = document.querySelector(".sliders-form");
   if (!dropdown || !trigger || !menu || !triggerText || !slidersForm) return;
 
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-    return null;
-  }
-
   function getImageId() {
     const input = document.querySelector(".sliders-form input[name='image_id']");
     return input ? input.value : null;
@@ -52,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const res = await fetch("/ajax/apply/", {
       method: "POST",
-      headers: { "X-CSRFToken": getCookie("csrftoken") },
+      headers: { "X-CSRFToken": getCSRFToken() },
       body: fd
     });
 
@@ -91,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const res = await fetch(`/preset/${presetId}/deletar-ajax/`, {
       method: "POST",
       headers: {
-        "X-CSRFToken": getCookie("csrftoken"),
+        "X-CSRFToken": getCSRFToken(),
       }
     });
   
