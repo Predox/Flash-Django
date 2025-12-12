@@ -335,7 +335,8 @@ def ajax_apply_edit(request):
     }
 
     # 1) Gera a imagem editada (Pillow) em memória
-    edited_img = services.apply_basic_edit_preview(img, params)
+    image_b64 = request.POST.get("image_base64")
+    edited_img = services.apply_basic_edit_preview(img, params, image_b64)
 
     buffer = BytesIO()
     edited_img.save(buffer, format="PNG")
