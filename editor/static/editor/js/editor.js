@@ -16,6 +16,11 @@ let isDragging = false;
 let lastX = 0;
 let lastY = 0;
 
+// controle de retry do carregamento inicial
+let initialLoadRetries = 0;
+const MAX_INITIAL_RETRIES = 5;
+const RETRY_BASE_DELAY_MS = 400;
+
 
 
 
@@ -43,6 +48,8 @@ window.updatePreviewFromBase64 = function (base64Image) {
 // ----------------------------------------------------------
 function drawImageOnCanvas() {
   if (!canvas || !ctx || !img) return;
+  // evita desenhar se a imagem não carregou ou está quebrada
+  if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, posX, posY, img.width * scale, img.height * scale);
@@ -50,6 +57,7 @@ function drawImageOnCanvas() {
 
 function fitImageToCanvas() {
   if (!canvas || !ctx || !img) return;
+  if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) return;
 
   const container = document.getElementById("canvas");
   const containerWidth = container.clientWidth || 1;
@@ -82,8 +90,24 @@ function loadInitialImage() {
   if (!hiddenImg || !hiddenImg.src) return;
 
   img = new Image();
+  // evita taint do canvas ao carregar imagens de CDN
+  img.crossOrigin = "anonymous";
   img.onload = () => {
+    initialLoadRetries = 0;
     fitImageToCanvas();
+  };
+  img.onerror = () => {
+    // se a Cloudinary ainda não disponibilizou a URL, tentamos novamente
+    if (initialLoadRetries < MAX_INITIAL_RETRIES) {
+      const delay = RETRY_BASE_DELAY_MS * Math.pow(2, initialLoadRetries);
+      console.warn(`Falha ao carregar imagem (tentativa ${initialLoadRetries + 1}). Retentando em ${delay}ms…`);
+      initialLoadRetries += 1;
+      setTimeout(() => {
+        img.src = hiddenImg.src + "?t=" + Date.now();
+      }, delay);
+    } else {
+      console.error("Não foi possível carregar a imagem inicial após múltiplas tentativas.");
+    }
   };
 
   img.src = hiddenImg.src + "?t=" + Date.now(); // evita cache
@@ -350,6 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hiddenImg.src = data.image_url;
 
         img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = fitImageToCanvas;
         img.src = data.image_url;
       }
