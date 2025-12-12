@@ -2,9 +2,13 @@
 Django>=5.2,<6.0
 gunicorn
 python-dotenv
-requests
 Pillow
+requests
 
-# IA / Imagem
+# IA
+tensorflow==2.20.0
 rembg==2.0.56
 replicate
+opencv-python-headless
+numpy
+
