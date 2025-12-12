@@ -4,6 +4,7 @@ gunicorn
 python-dotenv
 Pillow
 requests
+whitenoise
 
 # IA
 tensorflow==2.20.0
