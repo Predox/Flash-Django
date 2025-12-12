@@ -63,8 +63,17 @@ def apply_basic_edit_preview(processed_img, params, image_base64=None):
     import base64
 
     if image_base64:
-        header, data = image_base64.split(",", 1)
-        image = Image.open(BytesIO(base64.b64decode(data))).convert("RGB")
+        try:
+            # aceita tanto data URI ("data:image/png;base64,....") quanto base64 puro
+            if "," in image_base64:
+                _, data = image_base64.split(",", 1)
+            else:
+                data = image_base64
+            image = Image.open(BytesIO(base64.b64decode(data))).convert("RGB")
+        except Exception:
+            # fallback para imagem original se base64 vier inválido
+            with processed_img.original_image.open("rb") as f:
+                image = Image.open(f).convert("RGB")
     else:
         with processed_img.original_image.open("rb") as f:
             image = Image.open(f).convert("RGB")
