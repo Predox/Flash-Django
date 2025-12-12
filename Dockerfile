@@ -35,5 +35,6 @@ RUN python manage.py collectstatic --noinput || true
 EXPOSE 8000
 
 # Comando de produção
-CMD ["gunicorn", "flash_project.wsgi:application", "--bind", "0.0.0.0:8000", "--workers=1", "--threads=2"]
+CMD sh -c "python manage.py migrate && gunicorn flash_project.wsgi:application --bind 0.0.0.0:8000"
+
 
