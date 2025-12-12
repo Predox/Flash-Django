@@ -13,7 +13,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 import base64
 from editor.models import Profile
 from io import BytesIO
@@ -213,7 +212,6 @@ def remove_bg_view(request, image_id):
     return redirect('editor:editor')
 
 @login_required
-@csrf_exempt
 def remove_bg_live(request):
     if request.method != "POST":
         return JsonResponse({"error": "Método inválido"}, status=400)
@@ -397,7 +395,6 @@ def apply_deeplab_ajax(request, image_id):
     })
 
 @login_required
-@csrf_exempt
 def apply_custom_edit(request, image_id):
     if request.method != "POST":
         return JsonResponse({"error": "Método inválido"}, status=405)
