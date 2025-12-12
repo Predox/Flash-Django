@@ -47,21 +47,23 @@ def apply_basic_edit(processed_img, params):
     original_name = processed_img.original_image.name
     result_name = original_name.replace("originals", "results")
 
-    result_path = os.path.join(
-        os.path.dirname(processed_img.original_image.path.replace("originals", "results")),
-        os.path.basename(result_name)
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+
+    processed_img.result_image.save(
+        f"edit_{processed_img.id}.png",
+        ContentFile(buffer.getvalue()),
+        save=True
     )
-    os.makedirs(os.path.dirname(result_path), exist_ok=True)
-
-    image.save(result_path)
-
-    processed_img.result_image.name = result_name
-    processed_img.save()
 
 
 def apply_basic_edit_preview(processed_img, params):
-    path = processed_img.original_image.path  
-    image = Image.open(path).convert("RGB")
+    from django.core.files.storage import default_storage
+    from PIL import Image
+    from io import BytesIO
+
+    with processed_img.original_image.open("rb") as f:
+        image = Image.open(f).convert("RGB")
 
 
 
@@ -162,12 +164,8 @@ def remove_background(image_obj: ProcessedImage) -> None:
         if not HAS_REMBG:
             raise RuntimeError('rembg não está instalado. Use: pip install rembg')
 
-        if image_obj.result_image:
-            path = image_obj.result_image.path
-        else:
-            path = image_obj.original_image.path
-
-        with open(path, 'rb') as f:
+        field = image_obj.result_image if image_obj.result_image else image_obj.original_image
+        with field.open("rb") as f:
             input_bytes = f.read()
 
         output_bytes = rembg_remove(input_bytes)
@@ -191,8 +189,8 @@ def inpainting(image_obj: ProcessedImage, prompt: str | None = None) -> None:
     """
     start = perf_counter()
     try:
-        path = image_obj.original_image.path
-        img = Image.open(path).convert('RGB')
+        with image_obj.original_image.open("rb") as f:
+            img = Image.open(f).convert("RGB")
 
         buffer = io.BytesIO()
         img.save(buffer, format='PNG')
@@ -236,7 +234,8 @@ def apply_deeplab(processed_image: "ProcessedImage"):
     # -------------------------
     # 1. Carrega imagem original
     # -------------------------
-    img = Image.open(processed_image.original_image.path).convert("RGB")
+    with processed_image.original_image.open("rb") as f:
+        img = Image.open(f).convert("RGB")
     w, h = img.size
 
     # -------------------------
@@ -412,7 +411,8 @@ def apply_edit_with_prompt(request, processed_image, selection_polygon, prompt):
     print("🔧 MODO:", mode)
 
     # Carrega imagem original
-    image = Image.open(processed_image.current_image_path()).convert("RGBA")
+    with processed_image.current_image_field().open("rb") as f:
+        image = Image.open(f).convert("RGBA")
     w, h = image.size
 
     # Se for FULL → ignora seleção e chama Pix2Pix
@@ -423,14 +423,12 @@ def apply_edit_with_prompt(request, processed_image, selection_polygon, prompt):
         edited.save(buffer, format="PNG")
 
         filename = f"results/edit_{processed_image.id}.png"
-        full_path = os.path.join(settings.MEDIA_ROOT, filename)
-        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        processed_image.result_image.save(
+            f"edit_{processed_image.id}.png",
+            ContentFile(buffer.getvalue()),
+            save=True
+        )
 
-        with open(full_path, "wb") as f:
-            f.write(buffer.getvalue())
-
-        processed_image.result_image.name = filename
-        processed_image.save()
         return processed_image.result_image.url
 
 
@@ -477,13 +475,9 @@ def apply_edit_with_prompt(request, processed_image, selection_polygon, prompt):
     buffer = BytesIO()
     final_img.save(buffer, format="PNG")
 
-    filename = f"results/edit_{processed_image.id}.png"
-    full_path = os.path.join(settings.MEDIA_ROOT, filename)
-    os.makedirs(os.path.dirname(full_path), exist_ok=True)
-    with open(full_path, "wb") as f:
-        f.write(buffer.getvalue())
-
-    processed_image.result_image.name = filename
-    processed_image.save()
-
+    processed_image.result_image.save(
+        f"edit_{processed_image.id}.png",
+        ContentFile(buffer.getvalue()),
+        save=True
+    )
     return processed_image.result_image.url

@@ -103,8 +103,9 @@ def editor_view(request):
             if upload_form.is_valid():
                 img = upload_form.save(commit=False)
                 img.user = request.user
-                img.operation = 'basic_edit'
-                img.save()
+                img.operation = "basic_edit"
+                img.params = {}
+                img.save(update_fields=["operation", "params"])
 
                 request.session['last_image_id'] = img.id
                 messages.success(request, 'Imagem importada!')
@@ -248,19 +249,12 @@ def remove_bg_live(request):
 def undo_remove_bg(request, image_id):
     img = get_object_or_404(ProcessedImage, id=image_id, user=request.user)
 
-    # se tiver uma imagem de resultado
     if img.result_image:
-        # deletar arquivo físico
-        file_path = img.result_image.path if img.result_image else img.original_image.path
-
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
-        # limpar campo
+        img.result_image.delete(save=False)
         img.result_image = None
-        img.save()
-
+        img.save(update_fields=["result_image"])
     return redirect("editor:editor_with_image", image_id)
+
 
 
 @login_required
@@ -322,33 +316,28 @@ def ajax_apply_edit(request):
     }
 
     # 1) Gera a imagem editada (Pillow) em memória
-       # salva os parâmetros no modelo para persistirem na UI
-    img.params = params
-    img.save(update_fields=["params"])
-
-    # Processa preview
     edited_img = services.apply_basic_edit_preview(img, params)
 
-    # Salvar sempre como edited_<id>.png
-    result_name = f"results/edited_{img.id}.png"
-    result_path = os.path.join(settings.MEDIA_ROOT, result_name)
-
-    os.makedirs(os.path.dirname(result_path), exist_ok=True)
-    edited_img.save(result_path)
-
-    # Atualiza o model
-    img.result_image.name = result_name
-    img.params = params
-    img.operation = "basic_edit"
-    img.save()
-
-
-    # 4) Devolve base64 pro preview instantâneo
     buffer = BytesIO()
     edited_img.save(buffer, format="PNG")
-    encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    buffer_value = buffer.getvalue()
 
+    # 2) SALVA a imagem no result_image (persistência)
+    img.result_image.save(
+        f"edited_{img.id}.png",
+        ContentFile(buffer_value),
+        save=False  # importante: não salvar duas vezes no banco
+    )
+
+    # 3) Atualiza estado da imagem e salva uma vez
+    img.operation = "basic_edit"
+    img.params = params
+    img.save(update_fields=["result_image", "operation", "params"])
+
+    # 4) Retorna preview em base64 pro front
+    encoded = base64.b64encode(buffer_value).decode("utf-8")
     return JsonResponse({"image": encoded})
+
 
 
 

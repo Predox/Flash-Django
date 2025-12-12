@@ -73,15 +73,8 @@ class ProcessedImage(models.Model):
     def __str__(self):
         return f'{self.get_operation_display()} - {self.user} - {self.created_at:%d/%m/%Y}'
 
-    def current_image_path(self):
-        """
-        Retorna o caminho do arquivo que deve ser usado como base:
-        - result_image, se existir (imagem já editada)
-        - original_image, caso contrário
-        """
-        if self.result_image and hasattr(self.result_image, "path"):
-            return self.result_image.path
-        return self.original_image.path
+    def current_image_field(self):
+        return self.result_image if self.result_image else self.original_image
 
 
 # ---------------- IA LOG -------------------
