@@ -93,11 +93,12 @@ MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
 MEDIA_ROOT = BASE_DIR / os.getenv("MEDIA_ROOT", "media")
 
 # Condicional: usa Cloudinary se credenciais existirem; caso contrário, FileSystemStorage (disco)
+USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "True") == "True"
 CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
 CLOUD_KEY = os.getenv("CLOUDINARY_API_KEY")
 CLOUD_SECRET = os.getenv("CLOUDINARY_API_SECRET")
 
-if CLOUD_NAME and CLOUD_KEY and CLOUD_SECRET:
+if USE_CLOUDINARY and CLOUD_NAME and CLOUD_KEY and CLOUD_SECRET:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     # Garante URLs HTTPS da Cloudinary em produção
     CLOUDINARY_STORAGE = {
@@ -123,7 +124,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.up.railway.app",
 ]
 
-if CLOUD_NAME and CLOUD_KEY and CLOUD_SECRET:
+if USE_CLOUDINARY and CLOUD_NAME and CLOUD_KEY and CLOUD_SECRET:
     cloudinary.config(
         cloud_name=CLOUD_NAME,
         api_key=CLOUD_KEY,
