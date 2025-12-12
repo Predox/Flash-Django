@@ -5,41 +5,6 @@
 
  // currentSelection deve ser sua seleção refinada pelo DeepLab
  // Ela está sendo atualizada no JS da seleção
- 
- async function sendPromptToAI() {
-    console.log(" FUNÇÃO sendPromptToAI FOI CHAMADA");
-    const prompt = document.getElementById("prompt-input").value;
-
-    if (!prompt) {
-        alert("Escreva um prompt antes de salvar.");
-        return;
-    }
-
-    if (!window.currentSelection) {
-        alert("Nenhuma seleção encontrada.");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("prompt", prompt);
-    formData.append("selection", JSON.stringify(window.currentSelection));
-
-    console.log("📡 Enviando requisição para IA…");
-    const resp = await fetch(`/apply_custom_edit/${IMAGE_ID}/`, {
-        method: "POST",
-        headers: { "X-CSRFToken": getCSRFToken() },
-        body: formData
-    });
-    const data = await resp.json();
-    console.log("📥 Resposta recebida:", data);
-
-    if (data.status === "ok") {
-        // Redireciona com a imagem editada
-        window.location.href = data.result_url;
-    } else {
-        alert("Erro ao aplicar IA: " + data.error);
-    }
-}
 
 function showLoading() {
     const el = document.getElementById("aiLoadingOverlay");

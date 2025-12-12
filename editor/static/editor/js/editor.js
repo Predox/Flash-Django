@@ -78,13 +78,14 @@ function loadInitialImage() {
   img.onload = () => {
     fitImageToCanvas();
   };
-  img.src = hiddenImg.src;
 
-  // Se a imagem já estiver carregada (cache), força o desenho
+  img.src = hiddenImg.src + "?t=" + Date.now(); // evita cache
+
   if (hiddenImg.complete) {
     img.onload();
   }
 }
+
 
 // ----------------------------------------------------------
 // ZOOM E ARRASTAR
@@ -300,49 +301,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-document.getElementById("btn-remove-bg").addEventListener("click", (e) => {
-  e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+  const removeBgBtn = document.getElementById("btn-remove-bg");
+  if (!removeBgBtn) return;
 
-  canvas.toBlob(async (blob) => {
-    if (!blob) {
-      alert("Erro ao capturar imagem!");
+  removeBgBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    if (!canvas || !img) {
+      alert("Nenhuma imagem carregada.");
       return;
     }
 
-    const formData = new FormData();
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
 
-    const imageIdInput = document.querySelector("input[name='image_id']");
-    if (!imageIdInput) {
-      alert("Imagem não encontrada no formulário.");
-      return;
-    }
-    const imageId = imageIdInput.value;
-    formData.append("image_id", imageId);
+      const imageIdInput = document.querySelector("input[name='image_id']");
+      if (!imageIdInput) return;
 
-    const file = new File([blob], "edited.png", { type: "image/png" });
-    formData.append("edited_image", file);
+      const formData = new FormData();
+      formData.append("image_id", imageIdInput.value);
+      formData.append(
+        "edited_image",
+        new File([blob], "edited.png", { type: "image/png" })
+      );
 
-    const response = await fetch("/remove-bg-live/", {
-      method: "POST",
-      body: formData,
-      headers: { "X-CSRFToken": getCSRFToken() }
-    });
+      const response = await fetch("/remove-bg-live/", {
+        method: "POST",
+        headers: { "X-CSRFToken": window.CSRF_TOKEN },
+        body: formData
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (data.status === "ok") {
-      hiddenImg.src = data.image_url;
+      if (data.status === "ok") {
+        hiddenImg.src = data.image_url;
 
-      img = new Image();
-      img.onload = () => fitImageToCanvas();
-      img.src = data.image_url;
-
-    } else {
-      alert("Erro ao remover fundo.");
-    }
-
-  }, "image/png");
+        img = new Image();
+        img.onload = fitImageToCanvas;
+        img.src = data.image_url;
+      }
+    }, "image/png");
+  });
 });
+
 
 
 
