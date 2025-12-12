@@ -101,17 +101,24 @@ def editor_view(request):
         if request.FILES.get('original_image'):
             upload_form = ImageUploadForm(request.POST, request.FILES)
             if upload_form.is_valid():
-                img = upload_form.save(commit=False)
-                img.user = request.user
-                img.operation = "basic_edit"
-                img.params = {}
-                img.save(update_fields=["operation", "params"])
+                try:
+                    img = upload_form.save(commit=False)
+                    img.user = request.user
+                    img.operation = "basic_edit"
+                    img.params = {}
+                    # Para novo objeto, salve sem update_fields para evitar inconsistências
+                    img.save()
 
-                request.session['last_image_id'] = img.id
-                messages.success(request, 'Imagem importada!')
-                return redirect('editor:editor')
+                    request.session['last_image_id'] = img.id
+                    messages.success(request, 'Imagem importada!')
+                    return redirect('editor:editor')
+                except Exception as exc:
+                    messages.error(request, f"Erro ao salvar imagem: {exc}")
+                    return redirect('editor:editor')
             else:
                 print("ERRO FORM:", upload_form.errors)
+                messages.error(request, 'Arquivo inválido para upload.')
+                return redirect('editor:editor')
 
 
 
