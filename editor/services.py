@@ -57,13 +57,17 @@ def apply_basic_edit(processed_img, params):
     )
 
 
-def apply_basic_edit_preview(processed_img, params):
-    from django.core.files.storage import default_storage
+def apply_basic_edit_preview(processed_img, params, image_base64=None):
     from PIL import Image
     from io import BytesIO
+    import base64
 
-    with processed_img.original_image.open("rb") as f:
-        image = Image.open(f).convert("RGB")
+    if image_base64:
+        header, data = image_base64.split(",", 1)
+        image = Image.open(BytesIO(base64.b64decode(data))).convert("RGB")
+    else:
+        with processed_img.original_image.open("rb") as f:
+            image = Image.open(f).convert("RGB")
 
 
 

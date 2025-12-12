@@ -17,9 +17,13 @@ let lastX = 0;
 let lastY = 0;
 
 
+
+
+
 // ----------------------------------------------------------
 // FUNÇÃO GLOBAL PARA ATUALIZAR PREVIEW (USADA PELOS PRESETS)
 // ----------------------------------------------------------
+// Atualiza o preview da imagem e define a base64
 window.updatePreviewFromBase64 = function (base64Image) {
   const newImg = new Image();
   newImg.onload = () => {
@@ -28,6 +32,9 @@ window.updatePreviewFromBase64 = function (base64Image) {
     fitImageToCanvas();
   };
   newImg.src = "data:image/png;base64," + base64Image;
+
+  // Define a base64 global
+  window.currentImageBase64 = base64Image;  // Aqui a base64 é salva globalmente
 };
 
 
@@ -166,7 +173,11 @@ function aplicarAJAX() {
   const formData = new FormData();
   formData.append("csrfmiddlewaretoken", csrfInput.value);
   formData.append("image_id", imageIdInput.value);
+  
+  // Envia a base64 da imagem
+  formData.append("image_base64", window.currentImageBase64); 
 
+  // Envia os parâmetros dos sliders
   document.querySelectorAll(".sliders-form input[type='range']").forEach((slider) => {
     formData.append(slider.name, slider.value);
   });
@@ -193,6 +204,7 @@ function aplicarAJAX() {
       console.error("Erro no AJAX de ajustes:", err);
     });
 }
+
 
 // ----------------------------------------------------------
 // SETUP DOS SLIDERS

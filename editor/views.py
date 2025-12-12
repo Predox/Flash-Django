@@ -333,6 +333,7 @@ def ajax_apply_edit(request):
     img.operation = "basic_edit"
     img.params = params
     img.save(update_fields=["result_image", "operation", "params"])
+    
 
     # 4) Retorna preview em base64 pro front
     encoded = base64.b64encode(buffer_value).decode("utf-8")
